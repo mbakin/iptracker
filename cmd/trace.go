@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
@@ -16,8 +17,7 @@ var traceCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 0 {
 			for _, ip := range args {
-				fmt.Println(ip)
-				showData()
+				showData(ip)
 			}
 		} else {
 			fmt.Println("Please provide an IP address")
@@ -38,8 +38,8 @@ type Ip struct {
 	Timezone string `json:"timezone"`
 }
 
-func showData() {
-	url := "http://ipinfo.io/1.1.1.1/geo"
+func showData(ip string) {
+	url := "http://ipinfo.io/" + ip + "/geo"
 	responseByte := getData(url)
 
 	data := Ip{}
@@ -48,9 +48,12 @@ func showData() {
 	if err != nil {
 		log.Fatal("Unable to unmarshal the data")
 	}
-	fmt.Println("Data Found :")
 
-	fmt.Printf("IP :%s\nCITY :%s\nREGION :%s\nCOUNTRY :%s\nLOCATION :%s\nTIMEZONE :%s\n", data.Ip, data.City, data.Region, data.Country, data.Loc, data.Timezone)
+	c := color.New(color.FgHiRed).Add(color.Underline).Add(color.Bold)
+	c.Println("DATA FOUND :")
+
+	ipColor := color.New(color.FgHiGreen)
+	ipColor.Printf("IP :%s\nCITY :%s\nREGION :%s\nCOUNTRY :%s\nLOCATION :%s\nTIMEZONE :%s\n", data.Ip, data.City, data.Region, data.Country, data.Loc, data.Timezone)
 }
 
 func getData(url string) []byte {
